@@ -328,14 +328,14 @@
 <p>整堆：G1</p>
 <p>两个收集器之间有连线表明他们可以搭配使用</p>
 <h3 id="1-Serial-收集器"><a href="#1-Serial-收集器" class="headerlink" title="1.Serial 收集器"></a>1.Serial 收集器</h3><p>Serial收集器是最基本、历史最悠久的单线程收集器。但他的”单线程“的意义并不仅仅是说明它只会使用一个CPU或一条收集线程去完成垃圾收集工作，更重要的是他在进行垃圾收集时，必须暂停其他所有的工作线程（Sun将这件事情称之为”Stop The World“）直到它收集结束。</p>
-<p><img src="http://images.cnitblog.com/blog/290922/201403/060000230031844.png" alt="img"></p>
+<p><img src="http://images2018.cnblogs.com/blog/1053518/201803/1053518-20180312155929745-1493774665.png" alt="img"></p>
 <h3 id="2-ParNew-收集器"><a href="#2-ParNew-收集器" class="headerlink" title="2.ParNew 收集器"></a>2.ParNew 收集器</h3><p>ParNew收集器其实就是Serial收集器的多线程版本，除了使用多条线程进行垃圾收集之外，其余行为包括Serial 收集器的所有控制参数、收集算法、Stop The World、对象分配规则、回收策略等都与Serial 收集器完全一样，实际上也两种收集器也共用了相当多的代码。</p>
 <p>它作为老年代的收集器，却无法与JDK中已经存在的新生代收集器Paralle Scavenge配合工作，所以在JDK1.5中使用CMS来收集老年代的时候，新生代只能选择ParNew或Serial收集器中的一个。</p>
-<p><img src="http://images2017.cnblogs.com/blog/998122/201709/998122-20170919224203665-2033215020.png" alt="img"></p>
+<p><img src="http://img5.imgtn.bdimg.com/it/u=1815825265,3001864538&amp;fm=11&amp;gp=0.jpg" alt="img"></p>
 <h3 id="3-Parallel-Scavenge-收集器"><a href="#3-Parallel-Scavenge-收集器" class="headerlink" title="3.Parallel Scavenge 收集器"></a>3.Parallel Scavenge 收集器</h3><p>Parallel Scavenge 收集器也是一个新生代收集器，他也是使用复制算法的收集器，又是并行的多线程收集器。</p>
 <p>Parallel Scavenge 收集器的特点使他的关注点与其他收集器不同，CMS等收集器关注点尽可能地缩短垃圾收集时用户现成的停顿时间，而Parallel Scavenge 收集器的目标则是达到一个可控制的吞吐量（Throughput）。所谓吞吐量就是CPU用于运行用户代码的时间与CPU总消耗时间的比值，及吞吐量=运行用户代码时间/（运行用户代码时间+垃圾收集时间），虚拟机总共运行了100分钟，其中垃圾收集花掉1分支，那吞吐量就是99%。</p>
 <h3 id="4-Serial-Old-收集器"><a href="#4-Serial-Old-收集器" class="headerlink" title="4.Serial Old 收集器"></a>4.Serial Old 收集器</h3><p>Serial Old时Serial收集器的老年代版本，它同样是一个单线程收集器，使用”标记-整理“算法。这个收集器的主要意义也是被Client模式下的虚拟机使用。如果在Server模式下，它主要还有两大用途：一个实在JDK1.5及之前的版本中与Parallel Scavenge收集器搭配使用，另外一个就是作为CMS收集器的后备预案，在并发收集发生Concurrent Mode Failure的时候使用。</p>
-<p><img src="http://img2.imgtn.bdimg.com/it/u=2940619329,3163007181&amp;fm=15&amp;gp=0.jpg" alt="img"></p>
+<p><img src="http://images2018.cnblogs.com/blog/1053518/201803/1053518-20180312155929745-1493774665.png" alt="img"></p>
 <h3 id="5-Parallel-Old-收集器"><a href="#5-Parallel-Old-收集器" class="headerlink" title="5.Parallel Old 收集器"></a>5.Parallel Old 收集器</h3><p>Parallel Old 是Parallel Scavenge收集器的老年代版本，使用多线程和“标记-整理“算法。这个收集器是在JDK1.6中才开始提供的，在此之前，新生代的Parallel Scavenge收集器一直处于比较尴尬的状态。原因是，如果新生代选择了Parallel Scavenge收集器，老年代除了Serial Old（PS markSweep)收集器外别无选择（Parallel Scavenge收集器无法与CMS收集器配合工作）。由于单线程的老年代Serial Old收集器在服务端应用性能上的”拖累”，即便使用了Parallel Scavenge收集器也未必能在整体引用上获得吞吐量最大化的效果，又因为老年代收集中无法充分利用服务器多CPU的处理能力，在老年代很大而且硬件比较高级的环境中，这种组合的吞吐量甚至还不一定有ParNew加CMS的组合“给力”。</p>
 <p>直到Parallel Old收集器出现后，“吞吐量优先”收集器终于有了比较名副其实的应用组合，在注重吞吐量及CPU资源敏感的场合，都可以优先考虑Parallel Scavenge加Parallel Old收集器。</p>
 <p><img src="http://img2.imgtn.bdimg.com/it/u=1386402115,1389397957&amp;fm=15&amp;gp=0.jpg" alt="img"></p>
@@ -350,7 +350,7 @@
 <p>CMS收集器对CPU资源非常敏感</p>
 <p>CMS收集器无法处理浮动垃圾（CMS并发清理阶段会产生一定的垃圾，这部分垃圾只能在下次GC的时候处理，称为浮动垃圾）</p>
 <p>CMS是基于“标记-清除”算法实现的，这意味收集结束时会产生大量空间碎片。空间碎片过多会给大对象分配带来麻烦。CMS收集器提供了一个-XX：+UseCMSCompactAtFullCollection开关参数用于Full GC之后整理碎片，但空间碎片整理是需要停顿的。</p>
-<p><img src="http://images2017.cnblogs.com/blog/720994/201711/720994-20171113112749687-1281745314.png" alt="img"></p>
+<p><img src="http://images2015.cnblogs.com/blog/926638/201706/926638-20170623162258054-1467865820.png" alt="img"></p>
 <h3 id="7-G1"><a href="#7-G1" class="headerlink" title="7.G1"></a>7.G1</h3><p>G1收集器将java堆均分成大小相同的区域（region，1M-32M，最多2000个，最大支持堆内存64G）。一个或多个不连续的区域共同组成eden、survivor或old区，但大小不再固定，这为内存应用提供了极大地弹性。G1垃圾收集过程与CMS类似。G1在堆内存中并发地对所有对象进行标记，决定对象的可达性。经过全局标记，G1了解哪些区域几乎是空的，然后优先收集这些区域，这就是GarbageFirst的命名由来。G1将垃圾收集和内存整理活动专注于那些几乎全是垃圾的区域，并建立停顿预测模型来决定每次GC时回收哪些区域，以满足用户设定的停顿时间。</p>
 <p>G1收集器是基于“标记-整理”算法实现的收集器，也就是它不会产生空间碎片，这对长时间运行的应用系统来说非常重要。</p>
 <p>它可以非常精确的控制停顿，既能让使用者明确指定在一个长度为M毫秒的时间片段内，消耗在垃圾收集上的时间不得超过N毫秒。</p>
@@ -365,7 +365,7 @@
     <div class="new-meta-box">
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-05-31T13:43:07+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-05-31T13:49:19+08:00">
   <a class="notlink">
     <i class="fas fa-clock" aria-hidden="true"></i>
     <p>最后更新于 2019年5月31日</p>
